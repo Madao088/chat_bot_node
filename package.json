@@ -1,0 +1,17 @@
+{
+  "name": "test_bot",
+  "version": "1.0.0",
+  "description": "\"chat bot test\"",
+  "main": "index.js",
+  "scripts": {
+    "serve": "nodemon index.js"
+  },
+  "author": "Hammad Uzair",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.1",
+    "nodemon": "^1.12.1",
+    "watson-developer-cloud": "^2.39.2"
+  }
+}
