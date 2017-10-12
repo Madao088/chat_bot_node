@@ -3,9 +3,20 @@ var router=express.Router();
 var watson = require("watson-developer-cloud");
 var TextToSpeechV1 = require('watson-developer-cloud/text-to-speech/v1');
 var DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
-
+var ToneAnalyzerV3 = require('watson-developer-cloud/tone-analyzer/v3');
 var fs = require('fs');
 let cred=require('./credentials');
+
+
+var tone_analyzer = new ToneAnalyzerV3({
+  username: cred.ta_username,
+  password: cred.ta_password,
+  version_date:"2016-05-19"
+});
+
+
+
+
 var conversation = new watson.ConversationV1({
         username: cred.username,
         password: cred.password,
@@ -63,12 +74,18 @@ router.post('/query', function (req, res) {
         if (err)
             res.status(500).json(err);
         else{
-            console.log(response);
-             if(response.entities[0]||(response.intents[0]&&response.intents[0].confidence<0.5))
+            if(response.output.nodes_visited[0]=="node_6_1507805337783"){
+                response.discovery=true;
+            }
+            else
+                response.discovery=false;
+            res.status(200).json(response);
+             /* f(response.entities[0]||(response.intents[0]&&response.intents[0].confidence<0.5))
                 console.log("yes");
             else
-                console.log("no"); 
-            var params = {
+                console.log("no");  */
+            /*text to speech*/
+            /* var params = {
                 text: response.output.text[0],
                 voice: 'en-US_AllisonVoice', // Optional voice
                 accept: 'audio/wav'
@@ -79,7 +96,23 @@ router.post('/query', function (req, res) {
                 res.status(200).json(error);
             }).pipe(fs.createWriteStream('hello_world.wav')).on('finish',function(){
             res.status(200).json(response);
-            })
+            }) */
+
+            /* var params = {
+                text: req.body.query,
+                tones: 'language'
+            };
+
+            tone_analyzer.tone_chat(params, function(error, resp) {
+                if (error)
+                    res.status(200).json(err);
+                else{
+                    console.log(resp);
+                    response.tone=resp;
+                     res.status(200).json(response);
+                    }
+                }
+             ); */
         }
             
     });
@@ -208,12 +241,25 @@ router.get('/logs',function(req, res){
 
     conversation.getLogs(params, function(err, response) {
         if (err) {
-            res.status(200).json(err);
+            res.status(500).json(err);
         } else {
            res.status(200).json(response.logs[8]);
         }
 
     });
+})
+
+router.post('/tone',function(req,res){
+    var params = {
+        utterances: req.body.query
+    };
+    tone_analyzer.tone_chat(params, function(error, response) {
+        if (error)
+            res.status(200).json(error);
+        else
+           res.status(200).json(response);
+        }
+    );
 })
 
 module.exports = router;

@@ -46,8 +46,11 @@ router.get('/collections/:e_id/:c_id',function(req,res){
     });
 })
 
-router.get('/query/:e_id/:c_id',function(req,res){ 
-    discovery.query({environment_id:req.params.e_id,collection_id:req.params.c_id,query_string:req.query.query}, function(error, data) {
+router.get('/query',function(req,res){ 
+    e_id="724dac4d-560c-499b-a849-2bc15d54e616";
+    c_id="5f3a8fe5-0786-4c94-9e04-33ba4bf47cf7";
+    discovery.query({environment_id:e_id,collection_id:c_id,natural_language_query:req.query.query,passages:true,highlight:true}, 
+        function(error, data) {
        res.status(200).json(data);
     });
 })
